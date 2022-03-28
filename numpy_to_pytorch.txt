@@ -1,0 +1,115 @@
+
+
+
+############################################################################
+np.meshgrid() -> torch.meshgrid()
+#np.meshgrid(1D-array1, 1D-array2)
+x1 = np.array( [1, 2, 3, 4] )
+y1 = np.array( [6, 7, 8] )
+X, Y = np.meshgrid(x1, y1)
+X = array( [1, 2, 3, 4],
+           [1, 2, 3, 4],
+           [1, 2, 3, 4],
+           [1, 2, 3, 4] )
+
+Y = array( [6, 6, 6, 6],
+           [7, 7, 7, 7],
+           [8, 8, 8, 8] )
+#######################################
+#torch.meshgrid(1D-tensor1, 1D-tensor2)
+x1 = torch.tensor( [1, 2, 3, 4] )
+y1 = torch.tensor( [6, 7, 8] )
+X, Y = torch.meshgrid(x1, y1)
+X = array( [1, 1, 1, 1],
+           [2, 2, 2, 2],
+           [3, 3, 3, 3],
+           [4, 4, 4, 4] )
+
+Y = array( [6, 7, 8],
+           [6, 7, 8],
+           [6, 7, 8],
+           [6, 7, 8] )
+
+X = torch.transpose(X, 0, 1) = tensor( [1, 2, 3, 4],
+                                       [1, 2, 3, 4],
+                                       [1, 2, 3, 4],
+                                       [1, 2, 3, 4] )
+
+Y = torch.transpose(Y, 0, 1) = tensor( [6, 6, 6, 6],
+                                       [7, 7, 7, 7],
+                                       [8, 8, 8, 8] )
+############################################################################
+
+
+
+############################################################################
+#PyTorch's implementation of np.delete()
+def delete(arr: torch.Tensor, ind: int, dim: int):
+    skip = [i for i in range(arr.size(dim)) if i != ind]
+    indices = [slice(None) if i != dim else skip for i in range(arr.ndim)]
+    return arr.__getitem__(indices)
+############################################################################
+
+
+
+
+############################################################################
+np.ravel() -> torch.ravel() [IN FORTRAN ORDER]
+#np.ravel(ndarray)
+X = np.ravel( [1, 2, 3],
+              [7, 8, 9] )
+X = array( [1, 2, 3, 7, 8, 9] )
+#np.ravel(ndarray, order='F')
+X = np.ravel( [1, 2, 3],
+              [7, 8, 9] , order='F')
+X = array( [1, 7, 2, 8, 3, 9] )
+############################################################################
+
+
+
+
+############################################################################
+np.reshape() -> torch.reshape() [IN FORTRAN ORDER]
+#Pytorch reshape in fortran order
+def reshape_fortran(x, shape):
+    if len(x.shape) > 0:
+        x = x.permute(*reversed(range(len(x.shape))))
+    return x.reshape(*reversed(shape)).permute(*reversed(range(len(shape))))
+############################################################################
+
+
+
+
+############################################################################
+Numpy aray slicing -> torch array slicing
+#Numpy array slicing
+#arr[start:stop:step]
+arr = np.asarray([1,2,3,4,5])
+#slicing array from last to first
+arr[::-1] = array([5,4,3,2,1])
+
+#However, Pytorch cannot have negative step. Hence, use flip 
+arr = torch.tensor([1,2,3,4,5])
+torch.flip(arr, [-1,]) = tensor([5,4,3,2,1])
+############################################################################
+
+
+
+
+############################################################################
+np.delete() -> Pytorch
+#To delete selected rows from array with Pytorch
+def torch_deleterows(arr: torch.tensor, rows, dim: int):
+    #rows contain the indices of rows (only 2 can be selected for now)
+    #to be deleted from dim
+    #interates through rows and concatenates rows to form newarr
+    newarr = torch.empty(size=(0,arr.size[1]))
+    for row in range(len(arr[0]) + 1):
+        if row != (rows[0] and rows[1]):
+            selected = torch.tensor(arr[row]).clone().detach()
+            newarr = torch.cat((newarr, selected), dim=0)
+    return newarr
+############################################################################
+
+
+
